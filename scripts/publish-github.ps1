@@ -52,7 +52,15 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Git commit failed.' }
   } elseif ($LASTEXITCODE -ne 0) { throw 'Unable to inspect staged files.' }
   & git push -u origin main
-  if ($LASTEXITCODE -ne 0) { throw 'Git push failed.' }
+  if ($LASTEXITCODE -ne 0) {
+    $networkSettings = Get-ItemProperty 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -ErrorAction SilentlyContinue
+    $proxy = if ($networkSettings.ProxyEnable -eq 1) { [string]$networkSettings.ProxyServer } else { '' }
+    if ($proxy -match '^([^;=]+:\d+)$') {
+      Write-Output 'Retrying Git push through the existing Windows proxy.'
+      & git -c "http.proxy=http://$proxy" -c 'http.version=HTTP/1.1' push -u origin main
+    }
+    if ($LASTEXITCODE -ne 0) { throw 'Git push failed.' }
+  }
   $commit = & git rev-parse HEAD
   & gh release create $tag 'artifacts/daily-feedback-debug.apk' 'artifacts/daily-feedback-debug.apk.sha256' 'app-release.json' --repo $repository --target $commit --title "每日正反馈 $($config.version)" --notes-file $NotesFile --latest
   if ($LASTEXITCODE -ne 0) { throw 'Release upload failed. Source may already be pushed; inspect GitHub Releases before retrying.' }
