@@ -1,6 +1,16 @@
 param([string]$NotesFile = 'RELEASE-NOTES.md')
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [Console]::OutputEncoding
 $projectDir = Split-Path $PSScriptRoot -Parent
+function Push-Source {
+  & git push -u origin main
+  if ($LASTEXITCODE -eq 0) { return }
+  $networkSettings = Get-ItemProperty 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -ErrorAction SilentlyContinue
+  $proxy = if ($networkSettings.ProxyEnable -eq 1) { [string]$networkSettings.ProxyServer } else { '' }
+  if ($proxy -match '^([^;=]+:\d+)$') { & git -c "http.proxy=http://$proxy" -c 'http.version=HTTP/1.1' push -u origin main }
+  if ($LASTEXITCODE -ne 0) { throw 'Git push failed.' }
+}
 Push-Location $projectDir
 try {
   $config = Get-Content -Raw 'app-release.json' | ConvertFrom-Json
@@ -51,18 +61,14 @@ try {
     & git commit -m "Release $tag"
     if ($LASTEXITCODE -ne 0) { throw 'Git commit failed.' }
   } elseif ($LASTEXITCODE -ne 0) { throw 'Unable to inspect staged files.' }
-  & git push -u origin main
-  if ($LASTEXITCODE -ne 0) {
-    $networkSettings = Get-ItemProperty 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -ErrorAction SilentlyContinue
-    $proxy = if ($networkSettings.ProxyEnable -eq 1) { [string]$networkSettings.ProxyServer } else { '' }
-    if ($proxy -match '^([^;=]+:\d+)$') {
-      Write-Output 'Retrying Git push through the existing Windows proxy.'
-      & git -c "http.proxy=http://$proxy" -c 'http.version=HTTP/1.1' push -u origin main
-    }
-    if ($LASTEXITCODE -ne 0) { throw 'Git push failed.' }
-  }
+  Push-Source
   $commit = & git rev-parse HEAD
   & gh release create $tag 'artifacts/daily-feedback-debug.apk' 'artifacts/daily-feedback-debug.apk.sha256' 'app-release.json' --repo $repository --target $commit --title "每日正反馈 $($config.version)" --notes-file $NotesFile --latest
   if ($LASTEXITCODE -ne 0) { throw 'Release upload failed. Source may already be pushed; inspect GitHub Releases before retrying.' }
+  & (Join-Path $PSScriptRoot 'update-release-manifest.ps1') -Tag $tag
+  & git add latest-release.json
+  & git commit -m "Publish update manifest for $tag"
+  if ($LASTEXITCODE -ne 0) { throw 'Release is published, but update manifest commit failed.' }
+  Push-Source
   Write-Output "Published: https://github.com/$repository/releases/tag/$tag"
 } finally { Pop-Location }

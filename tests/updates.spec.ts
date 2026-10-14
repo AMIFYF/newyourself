@@ -1,4 +1,20 @@
 import { test, expect } from "@playwright/test";
+test("anonymous API rate limit uses the same repository release manifest", async ({
+  page,
+}) => {
+  await page.route(endpoint, (route) =>
+    route.fulfill({ status: 403, json: { message: "rate limit" } }),
+  );
+  await page.route(
+    "https://raw.githubusercontent.com/AMIFYF/newyourself/main/latest-release.json",
+    (route) => route.fulfill({ json: release }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "检查更新", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "发现新版本 v1.2.0" }),
+  ).toBeVisible();
+});
 const endpoint =
   "https://api.github.com/repos/AMIFYF/newyourself/releases/latest";
 const release = {
@@ -45,10 +61,10 @@ test("check update, download, retry and local records persist", async ({
   await expect(page.getByRole("button", { name: "已经完成 ✓" })).toBeVisible();
   await page.unroute(endpoint);
   await page.route(endpoint, (route) =>
-    route.fulfill({ json: { ...release, tag_name: "v1.1.0" } }),
+    route.fulfill({ json: { ...release, tag_name: "v1.1.1" } }),
   );
   await page.getByRole("button", { name: "检查更新", exact: true }).click();
-  await expect(page.getByText("当前版本 v1.1.0 已是最新版本。")).toBeVisible();
+  await expect(page.getByText("当前版本 v1.1.1 已是最新版本。")).toBeVisible();
   await page.unroute(endpoint);
   await page.route(endpoint, (route) => route.abort());
   await page.getByRole("button", { name: "检查更新", exact: true }).click();

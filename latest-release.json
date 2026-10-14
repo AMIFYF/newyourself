@@ -1,0 +1,29 @@
+{
+  "assets": [
+    {
+      "name": "app-release.json",
+      "state": "uploaded",
+      "size": 135,
+      "browser_download_url": "https://github.com/AMIFYF/newyourself/releases/download/v1.1.0/app-release.json",
+      "digest": "sha256:32cbb9a631ef3aafcbc2da524b4c0135f26553fd0392bfdb307f464eb002de0d"
+    },
+    {
+      "name": "daily-feedback-debug.apk",
+      "state": "uploaded",
+      "size": 4359976,
+      "browser_download_url": "https://github.com/AMIFYF/newyourself/releases/download/v1.1.0/daily-feedback-debug.apk",
+      "digest": "sha256:1e77654f23b129b723e41e3a6b508e04b7ef551e3bd26d393fb0c21b35de4ed3"
+    },
+    {
+      "name": "daily-feedback-debug.apk.sha256",
+      "state": "uploaded",
+      "size": 91,
+      "browser_download_url": "https://github.com/AMIFYF/newyourself/releases/download/v1.1.0/daily-feedback-debug.apk.sha256",
+      "digest": "sha256:b33e457c4362e384bab696cc32b7b1d90019d76520fabd8d4039d9ceee9e1add"
+    }
+  ],
+  "draft": false,
+  "tag_name": "v1.1.0",
+  "prerelease": false,
+  "body": "# 每日正反馈 1.1.0\n\n- 新增“检查更新”，从 GitHub Releases 获取正式版本。\n- 发现更高版本时显示更新说明，点击“下载并更新”打开 APK 下载链接。\n- 处理未发布版本、缺少安装包、请求受限和网络失败。\n- 保留原有记录、计时、XP、历史、统计和 JSON 备份功能。\n\n从 1.0 覆盖安装即可，包名与签名保持一致。不要先卸载旧版。建议更新前导出 JSON 备份。\n"
+}

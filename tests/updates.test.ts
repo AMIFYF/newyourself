@@ -46,6 +46,36 @@ beforeEach(() => {
   mocks.open.mockResolvedValue({ completed: true });
 });
 afterEach(() => vi.unstubAllGlobals());
+it("falls back to the published manifest when anonymous API is rate limited", async () => {
+  mocks.native = true;
+  mocks.http
+    .mockResolvedValueOnce({ status: 403, data: null })
+    .mockResolvedValueOnce({ status: 200, data: release });
+  await expect(checkForUpdates()).resolves.toMatchObject({ kind: "available" });
+  expect(mocks.http).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      url: "https://raw.githubusercontent.com/AMIFYF/newyourself/main/latest-release.json",
+    }),
+  );
+});
+it("still validates APK URLs in the fallback manifest", async () => {
+  mocks.native = true;
+  mocks.http
+    .mockResolvedValueOnce({ status: 429, data: null })
+    .mockResolvedValueOnce({
+      status: 200,
+      data: {
+        ...release,
+        assets: [
+          {
+            ...release.assets[0],
+            browser_download_url: "https://evil.example/app.apk",
+          },
+        ],
+      },
+    });
+  await expect(checkForUpdates()).rejects.toThrow("下载地址");
+});
 it.each([
   ["1.10.0", "1.2.0", 1],
   ["v1.1.0", "1.1", 0],

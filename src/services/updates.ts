@@ -99,6 +99,36 @@ export function evaluateRelease(
 export async function currentAppVersion(): Promise<string> {
   return isNative ? (await App.getInfo()).version : config.version;
 }
+async function requestRelease(
+  url: string,
+  headers: Record<string, string>,
+): Promise<{ status: number; data: unknown }> {
+  if (isNative) {
+    const response = await CapacitorHttp.get({
+      url,
+      headers,
+      connectTimeout: 12000,
+      readTimeout: 12000,
+      responseType: "json",
+    });
+    return { status: response.status, data: response.data };
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(url, {
+      headers,
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    return {
+      status: response.status,
+      data: response.ok ? await response.json() : null,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 export async function checkForUpdates(): Promise<UpdateResult> {
   const repository = validateRepository(config.githubRepository);
   const version = await currentAppVersion();
@@ -108,30 +138,16 @@ export async function checkForUpdates(): Promise<UpdateResult> {
     "X-GitHub-Api-Version": "2022-11-28",
   };
   try {
-    let status: number, data: unknown;
-    if (isNative) {
-      const response = await CapacitorHttp.get({
-        url,
-        headers,
-        connectTimeout: 12000,
-        readTimeout: 12000,
-        responseType: "json",
-      });
-      status = response.status;
-      data = response.data;
-    } else {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
-      try {
-        const response = await fetch(url, {
-          headers,
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        status = response.status;
-        data = response.ok ? await response.json() : null;
-      } finally {
-        clearTimeout(timeout);
+    let { status, data } = await requestRelease(url, headers);
+    if (status === 403 || status === 429) {
+      // Written only after APK upload succeeds; it is never the development version.
+      const fallback = await requestRelease(
+        `https://raw.githubusercontent.com/${repository}/main/latest-release.json`,
+        { Accept: "application/json" },
+      );
+      if (fallback.status === 200) {
+        status = fallback.status;
+        data = fallback.data;
       }
     }
     if (status === 404)
