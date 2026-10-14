@@ -1,0 +1,5 @@
+package com.dailyfeedback.app;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}
