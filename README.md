@@ -1,6 +1,6 @@
 # 日有所得 · 个人每日正反馈记录器
 
-1.1.0 新增 GitHub Releases 检查更新与本地发布脚本，见 [GITHUB-UPDATES.md](./GITHUB-UPDATES.md)。
+当前版本 1.1.1，支持 GitHub Releases 检查更新、API 限流后备来源和本地发布脚本，见 [GITHUB-UPDATES.md](./GITHUB-UPDATES.md)。公开源码与 APK 位于 [AMIFYF/newyourself](https://github.com/AMIFYF/newyourself)。
 
 现已在同一项目加入 Android App「每日正反馈」。Android 工程、APK、重建及 Android Studio 使用说明见 [ANDROID.md](./ANDROID.md)。网页版启动方式保持不变。
 
