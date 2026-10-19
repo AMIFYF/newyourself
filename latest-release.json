@@ -1,27 +1,27 @@
 {
-    "body":  "# 每日正反馈 1.1.1\n\n- 新增“检查更新”，从 GitHub Releases 获取正式版本。\n- 发现更高版本时显示更新说明，点击“下载并更新”打开 APK 下载链接。\n- 处理未发布版本、缺少安装包、请求受限和网络失败。\n- GitHub API 限流时自动使用同仓库的公开版本清单，清单只在正式 APK 上传成功后更新。\n- 保留原有记录、计时、XP、历史、统计和 JSON 备份功能。\n\n从 1.0 覆盖安装即可，包名与签名保持一致。不要先卸载旧版。建议更新前导出 JSON 备份。\n",
-    "tag_name":  "v1.1.1",
+    "body":  "# 每日正反馈 1.2.0\n\n- 将三个“今天推进了什么”记录栏替换为“想做的事”。\n- 可增加、修改和删除未完成事项；未完成事项自动保留到以后，无需每天重写。\n- 点击完成，每件只奖励一次 5 XP，标题和完成时间归档到完成当天的历史。\n- 今日总 XP 和累计 XP 包含事项奖励；当天完成至少一件即可完成五项中的这一项。\n- 自动兼容旧数据和备份，保留旧版推进文本、过去完成度、专注计时及 XP。\n\n直接覆盖安装，不要卸载旧 App。建议先导出 JSON 备份。新数据备份使用 v2 格式，需要 1.2.0 或更高版本导入。\n",
+    "tag_name":  "v1.2.0",
     "assets":  [
                    {
                        "name":  "app-release.json",
                        "state":  "uploaded",
                        "size":  135,
-                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.1.1/app-release.json",
-                       "digest":  "sha256:d364ee3b72de0796a498a31d55da12edcd47eafd9395c8012c44b6209d4c0326"
+                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.2.0/app-release.json",
+                       "digest":  "sha256:87e684531f04be22d2a2c96f4fd227470d9db18506689c47b65832b5f295c1dc"
                    },
                    {
                        "name":  "daily-feedback-debug.apk",
                        "state":  "uploaded",
-                       "size":  4360064,
-                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.1.1/daily-feedback-debug.apk",
-                       "digest":  "sha256:f2179dfada9c0c9c1b7b7a3b8310969bce4b2520be6d386602fd6285faf932a5"
+                       "size":  4361384,
+                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.2.0/daily-feedback-debug.apk",
+                       "digest":  "sha256:3a4434945f3e658133bf080756580acbce08450688adacaf52ad741948ee673f"
                    },
                    {
                        "name":  "daily-feedback-debug.apk.sha256",
                        "state":  "uploaded",
                        "size":  91,
-                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.1.1/daily-feedback-debug.apk.sha256",
-                       "digest":  "sha256:cfc26e2d488cb802ad3391ed0a39d528dfff59eb9eff05b1bcf32d6173457e0f"
+                       "browser_download_url":  "https://github.com/AMIFYF/newyourself/releases/download/v1.2.0/daily-feedback-debug.apk.sha256",
+                       "digest":  "sha256:4bc26fb02e0c21f66e16b7c2d249b10a69d2361121f9a5d48c2eaf61d5ae0559"
                    }
                ],
     "prerelease":  false,
