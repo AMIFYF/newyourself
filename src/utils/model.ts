@@ -10,7 +10,8 @@ export const dateOffset = (date: string, offset: number) => {
   return localDate(d.getTime());
 };
 export const emptyData = (): Data => ({
-  version: 1,
+  version: 2,
+  wishes: [],
   days: {},
   focus: null,
   low: null,
@@ -22,12 +23,16 @@ export const emptyDay = (date: string): DailyRecord => ({
   coreTaskCompleted: false,
   focusSessions: [],
   progressNotes: ["", "", ""],
+  completedWishes: [],
+  legacyProgressCompleted: false,
   lowStimulusActivities: [],
 });
 export const getDay = (s: Data, date: string) =>
   (s.days[date] ??= emptyDay(date));
 export function totals(d: DailyRecord) {
-  const xp = d.focusSessions.reduce((v, s) => v + s.xp, 0);
+  const focusXP = d.focusSessions.reduce((v, s) => v + s.xp, 0);
+  const wishesXP = d.completedWishes.reduce((v, w) => v + w.xp, 0);
+  const xp = focusXP + wishesXP;
   const minutes = d.focusSessions.reduce((v, s) => v + s.duration, 0);
   const low = d.lowStimulusActivities.reduce((v, a) => v + a.minutes, 0);
   const notes = d.progressNotes.filter((n) => n.trim()).length;
@@ -35,11 +40,14 @@ export function totals(d: DailyRecord) {
     d.morningNoPhone,
     !!d.coreTask.trim() && d.coreTaskCompleted,
     d.focusSessions.length > 0,
-    notes === 3,
+    d.completedWishes.length > 0 || d.legacyProgressCompleted,
     low >= LOW_GOAL,
   ];
   return {
     xp,
+    focusXP,
+    wishesXP,
+    wishes: d.completedWishes.length,
     minutes,
     low,
     notes,

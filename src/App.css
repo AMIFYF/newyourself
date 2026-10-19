@@ -20,6 +20,35 @@
 .later {
   margin-left: 10px;
 }
+.wish-card form > input {
+  flex: 1;
+  min-width: 0;
+}
+.wish-list {
+  margin-top: 18px;
+}
+.wish-item {
+  padding: 16px 0;
+  border-top: 1px solid #e0e3d9;
+}
+.wish-item p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-bottom: 8px;
+}
+.wish-item .row {
+  margin-top: 12px;
+}
+.completed-wishes {
+  border-top: 1px solid #dce2d6;
+  padding-top: 16px;
+  margin-top: 12px;
+}
+.completed-wishes p {
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
 .shell {
   padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   padding-bottom: var(

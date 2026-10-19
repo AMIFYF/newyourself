@@ -1,5 +1,6 @@
 import { beforeEach, afterEach, describe, it, expect, vi } from "vitest";
 import { emptyData, getDay, localDate, totals } from "../src/utils/model";
+import { addWish, completeWish } from "../src/utils/wishes";
 
 const mocks = vi.hoisted(() => ({
   values: new Map<string, string>(),
@@ -58,6 +59,25 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("native persistence and lifecycle adapter", () => {
+  it("serializes native wish completion and retains a single XP reward after restart", async () => {
+    const { store } = await import("../src/services/storage");
+    await store.initialize();
+    await store.update((s) => addWish(s, "wish-once", "跨日事项", 0));
+    const now = Date.now();
+    await Promise.all([
+      store.update((s) => completeWish(s, "wish-once", now)),
+      store.update((s) => completeWish(s, "wish-once", now)),
+      store.initialize(),
+    ]);
+    expect(store.snapshot().wishes).toHaveLength(0);
+    expect(store.snapshot().days[localDate(now)].completedWishes).toHaveLength(
+      1,
+    );
+    vi.resetModules();
+    const reopened = (await import("../src/services/storage")).store;
+    await reopened.initialize();
+    expect(totals(reopened.snapshot().days[localDate(now)]).xp).toBe(5);
+  });
   it("preserves every record and running timers after store restart", async () => {
     const { store } = await import("../src/services/storage");
     await store.initialize();
@@ -68,6 +88,15 @@ describe("native persistence and lifecycle adapter", () => {
     d.coreTaskCompleted = true;
     d.morningNoPhone = true;
     d.progressNotes = ["一", "二", "三"];
+    d.completedWishes = [
+      {
+        id: "wish-done",
+        text: "完成一件事",
+        createdAt: 0,
+        completedAt: Date.now(),
+        xp: 5,
+      },
+    ];
     d.focusSessions = [
       {
         id: "done",

@@ -16,7 +16,7 @@ export function Summary({ day }: { day: DailyRecord }) {
           </p>
           <small>今日专注</small>
           <p>
-            {day.focusSessions.length} 次 · {t.minutes} 分钟 · {t.xp} XP
+            {day.focusSessions.length} 次 · {t.minutes} 分钟 · {t.focusXP} XP
           </p>
           <small>起床后不刷手机 / 低刺激活动</small>
           <p>
@@ -25,12 +25,38 @@ export function Summary({ day }: { day: DailyRecord }) {
           </p>
         </div>
         <div>
-          <small>今日推进 · {t.notes} / 3</small>
-          <ol>
-            {day.progressNotes.map((n, i) => (
-              <li key={i}>{n.trim() || "尚未记录"}</li>
-            ))}
-          </ol>
+          <small>
+            完成的想做的事 · {t.wishes} 件 · {t.wishesXP} XP
+          </small>
+          {day.completedWishes.length ? (
+            <ol>
+              {day.completedWishes.map((w) => (
+                <li key={w.id}>
+                  {w.text} ✓<br />
+                  <small>
+                    {new Date(w.completedAt).toLocaleString("zh-CN")} · +{w.xp}{" "}
+                    XP
+                  </small>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="muted">当天尚未完成事项</p>
+          )}
+          {t.notes > 0 && (
+            <>
+              <small>旧版推进记录（保留）</small>
+              <ol>
+                {day.progressNotes
+                  .filter((n) => n.trim())
+                  .map((n, i) => (
+                    <li key={i}>{n}</li>
+                  ))}
+              </ol>
+            </>
+          )}
+          <small>当日总 XP</small>
+          <p>{t.xp} XP</p>
         </div>
       </div>
     </section>

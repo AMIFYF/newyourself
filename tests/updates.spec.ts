@@ -12,13 +12,13 @@ test("anonymous API rate limit uses the same repository release manifest", async
   await page.goto("/");
   await page.getByRole("button", { name: "检查更新", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "发现新版本 v1.2.0" }),
+    page.getByRole("heading", { name: "发现新版本 v1.3.0" }),
   ).toBeVisible();
 });
 const endpoint =
   "https://api.github.com/repos/AMIFYF/newyourself/releases/latest";
 const release = {
-  tag_name: "v1.2.0",
+  tag_name: "v1.3.0",
   draft: false,
   prerelease: false,
   body: "保留原有记录\n优化操作",
@@ -28,7 +28,7 @@ const release = {
       state: "uploaded",
       size: 12345,
       browser_download_url:
-        "https://github.com/AMIFYF/newyourself/releases/download/v1.2.0/daily-feedback-debug.apk",
+        "https://github.com/AMIFYF/newyourself/releases/download/v1.3.0/daily-feedback-debug.apk",
     },
   ],
 };
@@ -42,7 +42,7 @@ test("check update, download, retry and local records persist", async ({
   await page.getByRole("button", { name: "完成核心任务" }).click();
   await page.getByRole("button", { name: "检查更新", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "发现新版本 v1.2.0" }),
+    page.getByRole("heading", { name: "发现新版本 v1.3.0" }),
   ).toBeVisible();
   await context.route(
     "https://github.com/AMIFYF/newyourself/releases/download/**",
@@ -52,7 +52,7 @@ test("check update, download, retry and local records persist", async ({
   const popup = page.waitForEvent("popup");
   await page.getByRole("button", { name: "下载并更新" }).click();
   const downloadTab = await popup;
-  expect(downloadTab.url()).toContain("/releases/download/v1.2.0/");
+  expect(downloadTab.url()).toContain("/releases/download/v1.3.0/");
   await downloadTab.close();
   await expect(page.getByLabel("今日核心任务", { exact: true })).toHaveValue(
     "更新时保留",
@@ -61,10 +61,10 @@ test("check update, download, retry and local records persist", async ({
   await expect(page.getByRole("button", { name: "已经完成 ✓" })).toBeVisible();
   await page.unroute(endpoint);
   await page.route(endpoint, (route) =>
-    route.fulfill({ json: { ...release, tag_name: "v1.1.1" } }),
+    route.fulfill({ json: { ...release, tag_name: "v1.2.0" } }),
   );
   await page.getByRole("button", { name: "检查更新", exact: true }).click();
-  await expect(page.getByText("当前版本 v1.1.1 已是最新版本。")).toBeVisible();
+  await expect(page.getByText("当前版本 v1.2.0 已是最新版本。")).toBeVisible();
   await page.unroute(endpoint);
   await page.route(endpoint, (route) => route.abort());
   await page.getByRole("button", { name: "检查更新", exact: true }).click();

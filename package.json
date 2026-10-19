@@ -1,14 +1,14 @@
 {
   "name": "daily-feedback",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
-    "test": "vitest run tests/model.test.ts tests/native.test.ts tests/updates.test.ts",
+    "test": "vitest run tests/model.test.ts tests/native.test.ts tests/updates.test.ts tests/wishes.test.ts",
     "typecheck": "tsc -b",
     "test:e2e": "playwright test",
     "android:sync": "npm run build && cap sync android",

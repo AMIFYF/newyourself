@@ -23,9 +23,9 @@ import {
   openUpdate,
 } from "../src/services/updates";
 const repo = "AMIFYF/newyourself",
-  url = `https://github.com/${repo}/releases/download/v1.2.0/daily-feedback-debug.apk`;
+  url = `https://github.com/${repo}/releases/download/v1.3.0/daily-feedback-debug.apk`;
 const release = {
-  tag_name: "v1.2.0",
+  tag_name: "v1.3.0",
   draft: false,
   prerelease: false,
   body: "更新说明",
@@ -91,10 +91,10 @@ it("rejects malformed and prerelease versions", () => {
 it("offers only a newer release with an uploaded APK", () => {
   expect(evaluateRelease(release, "1.1.0", repo)).toMatchObject({
     kind: "available",
-    version: "1.2.0",
+    version: "1.3.0",
     downloadUrl: url,
   });
-  expect(evaluateRelease(release, "1.2.0", repo)).toMatchObject({
+  expect(evaluateRelease(release, "1.3.0", repo)).toMatchObject({
     kind: "current",
   });
   expect(evaluateRelease(release, "2.0.0", repo)).toMatchObject({

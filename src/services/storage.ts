@@ -6,6 +6,7 @@ export { STORAGE_KEY } from "./persistence";
 let state = emptyData();
 let error = "";
 let blocked = false;
+let needsMigration = false;
 let pending: Promise<void> = Promise.resolve();
 const listeners = new Set<() => void>();
 const emit = () => {
@@ -16,6 +17,7 @@ async function read() {
   try {
     const raw = await persistence.read();
     state = raw ? parseData(raw) : emptyData();
+    needsMigration = !!raw && JSON.parse(raw).version === 1;
     error = "";
     blocked = false;
   } catch {
@@ -63,12 +65,17 @@ export const store = {
       await read();
       if (!blocked) {
         const next = structuredClone(state);
-        if (settle(next, Date.now())) await write(next);
+        if (settle(next, Date.now()) || needsMigration) await write(next);
       }
       emit();
     }),
-  update: (change: (data: Data) => void) =>
-    enqueue(async () => {
+  update: (change: (data: Data) => void) => {
+    // A protected/corrupt snapshot stays read-only until explicit initialization or import.
+    if (blocked) {
+      emit();
+      return Promise.resolve();
+    }
+    return enqueue(async () => {
       await read();
       if (blocked) {
         emit();
@@ -78,7 +85,8 @@ export const store = {
       settle(next, Date.now());
       change(next);
       await write(next);
-    }),
+    });
+  },
   replace: (next: Data) => enqueue(() => write(next)),
   flush: () => pending,
   async exportText() {

@@ -51,8 +51,9 @@ test("complete day, refresh, history, statistics, export/import and double-confi
   await page.getByRole("button", { name: "完成", exact: true }).click();
   await page.getByLabel("今日核心任务", { exact: true }).fill("完成第一版 MVP");
   await page.getByRole("button", { name: "完成核心任务", exact: true }).click();
-  for (let i = 1; i <= 3; i++)
-    await page.getByLabel(`推进事项${i}`).fill(`推进事项 ${i}`);
+  await page.getByLabel("新的想做的事").fill("推进一件事");
+  await page.getByRole("button", { name: "增加", exact: true }).click();
+  await page.getByRole("button", { name: "完成 +5 XP", exact: true }).click();
   await page.getByText("忘记计时？手动补录").click();
   await page
     .getByRole("button", { name: "补录 25 分钟 / +10 XP", exact: true })
@@ -72,7 +73,7 @@ test("complete day, refresh, history, statistics, export/import and double-confi
     page.getByText("25 分钟 · +10 XP · 手动补录", { exact: false }),
   ).toBeVisible();
   await page.getByRole("button", { name: "03统计" }).click();
-  await expect(page.locator(".metrics .card").first()).toContainText("10");
+  await expect(page.locator(".metrics .card").first()).toContainText("15");
   await page.getByText("本地数据与备份", { exact: true }).click();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "导出 JSON" }).click();
@@ -91,13 +92,11 @@ test("complete day, refresh, history, statistics, export/import and double-confi
   await expect(page.getByText("导入成功。")).toBeVisible();
   await page.getByRole("button", { name: "01今日" }).click();
   await expect(page.getByText("五项完成 5 / 5")).toBeVisible();
-  await page
-    .getByLabel("导入备份文件")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"version":9}'),
-    });
+  await page.getByLabel("导入备份文件").setInputFiles({
+    name: "bad.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"version":9}'),
+  });
   await expect(page.getByText("备份格式无效，原有数据未修改。")).toBeVisible();
   await expect(page.getByText("五项完成 5 / 5")).toBeVisible();
 });

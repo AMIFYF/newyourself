@@ -57,6 +57,9 @@ describe("focus and daily rules", () => {
     d.morningNoPhone = true;
     d.coreTaskCompleted = true;
     d.progressNotes[2] = "c";
+    d.completedWishes = [
+      { id: "wish", text: "完成一件事", createdAt: 0, completedAt: 0, xp: 5 },
+    ];
     d.focusSessions.push({
       id: "f",
       duration: 50,
@@ -72,7 +75,7 @@ describe("focus and daily rules", () => {
     });
     expect(totals(d)).toMatchObject({
       complete: 5,
-      xp: 25,
+      xp: 30,
       minutes: 50,
       low: 30,
     });
@@ -85,6 +88,15 @@ describe("focus and daily rules", () => {
       d.coreTask = "x";
       d.coreTaskCompleted = true;
       d.progressNotes = ["a", "b", "c"];
+      d.completedWishes = [
+        {
+          id: "wish" + date,
+          text: "完成一件事",
+          createdAt: 0,
+          completedAt: 0,
+          xp: 5,
+        },
+      ];
       d.focusSessions = [
         { id: date, duration: 25, xp: 10, manual: true, completedAt: 0 },
       ];

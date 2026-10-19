@@ -19,6 +19,8 @@ export interface DailyRecord {
   coreTaskCompleted: boolean;
   focusSessions: FocusSession[];
   progressNotes: [string, string, string];
+  completedWishes: CompletedWish[];
+  legacyProgressCompleted: boolean;
   lowStimulusActivities: Activity[];
 }
 export interface FocusTimer {
@@ -28,8 +30,18 @@ export interface FocusTimer {
   startedAt: number | null;
 }
 export interface Data {
-  version: 1;
+  version: 2;
+  wishes: Wish[];
   days: Record<string, DailyRecord>;
   focus: FocusTimer | null;
   low: { id: string; startedAt: number } | null;
+}
+export interface Wish {
+  id: string;
+  text: string;
+  createdAt: number;
+}
+export interface CompletedWish extends Wish {
+  completedAt: number;
+  xp: number;
 }

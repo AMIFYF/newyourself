@@ -1,5 +1,6 @@
 import type { Data } from "../types";
-import { XP } from "../config/rules";
+import { XP, WISH_XP } from "../config/rules";
+import { localDate } from "../utils/model";
 // Reject malformed backups before replacing any saved data. Totals are always derived.
 export function parseData(text: string): Data {
   const s = JSON.parse(text);
@@ -19,7 +20,24 @@ export function parseData(text: string): Data {
     if (typeof v !== "string" || !v || ids.has(v)) fail();
     ids.add(v as string);
   };
-  if (!object(s) || s.version !== 1 || !object(s.days)) fail();
+  if (!object(s) || ![1, 2].includes(s.version) || !object(s.days)) fail();
+  const legacy = s.version === 1;
+  if (legacy) s.wishes = [];
+  if (!Array.isArray(s.wishes)) fail();
+  const timestamp = (v: unknown) =>
+    number(v) && (v as number) <= 8640000000000000;
+  const wish = (w: any) => {
+    if (
+      !object(w) ||
+      !str(w.text) ||
+      !w.text.trim() ||
+      w.text.length > 3000 ||
+      !timestamp(w.createdAt)
+    )
+      fail();
+    id(w.id);
+  };
+  for (const w of s.wishes) wish(w);
   for (const [key, d] of Object.entries(s.days) as [string, any][]) {
     if (
       !date(key) ||
@@ -35,6 +53,20 @@ export function parseData(text: string): Data {
       !Array.isArray(d.lowStimulusActivities)
     )
       fail();
+    if (legacy) {
+      d.completedWishes = [];
+      d.legacyProgressCompleted =
+        key < localDate() && d.progressNotes.every((n: string) => !!n.trim());
+    }
+    if (
+      !Array.isArray(d.completedWishes) ||
+      typeof d.legacyProgressCompleted !== "boolean"
+    )
+      fail();
+    for (const w of d.completedWishes) {
+      wish(w);
+      if (!timestamp(w.completedAt) || w.xp !== WISH_XP) fail();
+    }
     for (const f of d.focusSessions) {
       if (
         !object(f) ||
@@ -77,5 +109,6 @@ export function parseData(text: string): Data {
     if (!object(s.low) || !number(s.low.startedAt)) fail();
     id(s.low.id);
   }
+  s.version = 2;
   return s as Data;
 }

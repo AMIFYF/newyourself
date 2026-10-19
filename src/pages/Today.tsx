@@ -11,6 +11,7 @@ import {
 import { XP } from "../config/rules";
 import { Summary } from "../components/Summary";
 import { SavedText } from "../components/SavedText";
+import { WishList } from "../components/WishList";
 const clock = (ms: number) => {
   const s = Math.ceil(ms / 1000);
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -60,7 +61,7 @@ export function Today({
           ["起床后不刷手机", t.flags[0] ? "已完成" : "待记录"],
           ["今日核心任务", t.flags[1] ? "已完成" : "待完成"],
           ["今日 XP", `${t.xp} XP`],
-          ["今天推进了什么", `${t.notes} / 3`],
+          ["想做的事", `${t.wishes} 件已完成`],
           ["低刺激活动", `${displayMinutes(t.low)} / 30 min`],
         ].map(([label, value], i) => (
           <div key={label}>
@@ -138,33 +139,7 @@ export function Today({
               </button>
             </div>
           </section>
-          <section className="card">
-            <div className="section-head">
-              <h2>今天推进了什么</h2>
-              <span className="badge">{t.notes} / 3</span>
-            </div>
-            <p className="muted">小事也值得被记录。</p>
-            <div className="notes">
-              {d.progressNotes.map((note, i) => (
-                <label key={i}>
-                  <span>0{i + 1}</span>
-                  <SavedText
-                    key={today}
-                    multiline
-                    label={`推进事项${i + 1}`}
-                    placeholder="今天推进了什么？"
-                    maxLength={3000}
-                    value={note}
-                    onSave={(value) => {
-                      edit((r) => {
-                        r.progressNotes[i] = value;
-                      });
-                    }}
-                  />
-                </label>
-              ))}
-            </div>
-          </section>
+          <WishList data={data} today={today} />
         </div>
         <div className="stack">
           <section className="card focus">
